@@ -701,6 +701,20 @@ Route::prefix('admin')->name('admin.')->middleware(['installed', 'apiKey', 'loca
     });
 });
 
+/**
+ * Marketplace Webhooks (Yemeksepeti - Trendyol Yemek - Getir)
+ */
+Route::prefix('marketplace')->group(function () {
+
+    // Yemeksepeti webhook
+    Route::post('/yemeksepeti/webhook', [\App\Http\Controllers\Marketplace\YemeksepetiController::class, 'webhook']);
+
+    // Trendyol Yemek webhook
+    Route::post('/trendyol/webhook', [\App\Http\Controllers\Marketplace\TrendyolYemekController::class, 'webhook']);
+
+    // Getir Yemek webhook
+    Route::post('/getir/webhook', [\App\Http\Controllers\Marketplace\GetirYemekController::class, 'webhook']);
+});
 Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey', 'localization'])->group(function () {
     Route::prefix('setting')->name('setting.')->group(function () {
         Route::get('/', [SettingController::class, 'index']);
@@ -805,7 +819,6 @@ Route::prefix('frontend')->name('frontend.')->middleware(['installed', 'apiKey',
         Route::post('/change-status/{order}', [FrontendDeliveryBoyOrderController::class, 'deliveryBoyOrderChangeStatus']);
     });
 });
-
 Route::prefix('table')->name('table.')->middleware(['installed', 'apiKey', 'localization'])->group(function () {
 
     Route::prefix('item-category')->name('item-category.')->group(function () {
@@ -822,10 +835,15 @@ Route::prefix('table')->name('table.')->middleware(['installed', 'apiKey', 'loca
         Route::get('/show/{frontendOrder}', [TableOrderController::class, 'show']);
         Route::post('/', [TableOrderController::class, 'store']);
     });
+});
+Route::middleware(['auth:sanctum', 'branch'])->prefix('marketplace')->group(function () {
+    Route::get('/credentials', [\App\Http\Controllers\Admin\MarketplaceCredentialController::class, 'index']);
+    Route::put('/credentials/{marketplace}', [\App\Http\Controllers\Admin\MarketplaceCredentialController::class, 'update']);
+});
 /**
  * Marketplace Webhooks (Yemeksepeti - Trendyol Yemek - Getir)
  */
-	Route::prefix('marketplace')->group(function () {
+Route::prefix('marketplace')->group(function () {
 
     // Yemeksepeti webhook
     Route::post('/yemeksepeti/webhook', [\App\Http\Controllers\Marketplace\YemeksepetiController::class, 'webhook']);
@@ -835,5 +853,4 @@ Route::prefix('table')->name('table.')->middleware(['installed', 'apiKey', 'loca
 
     // Getir Yemek webhook
     Route::post('/getir/webhook', [\App\Http\Controllers\Marketplace\GetirYemekController::class, 'webhook']);
-});
 });
